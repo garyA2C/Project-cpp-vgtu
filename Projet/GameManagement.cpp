@@ -14,6 +14,7 @@ GameManagement::~GameManagement()
 	delete b;
 }
 
+//for alternate between white and black's turn
 void GameManagement::changeturn()
 {
 	if (turn == 0) {
@@ -24,12 +25,14 @@ void GameManagement::changeturn()
 	}
 }
 
+//main loop for the game
 void GameManagement::gameloop()
 {
+
 	while (!isgamefinish()) {
 		bool needinput = true;
 
-		while (needinput) {
+		while (needinput) { //loop for every turn of the player (until the command entered is correct)
 			int xs, ys, xd, yd;
 
 			if (turn == 0) {
@@ -48,11 +51,11 @@ void GameManagement::gameloop()
 			cin >> xd;
 			cin >> yd;
 
-			needinput = !(b->move(xs, ys, xd, yd, turn));
+			needinput = !(b->move(xs, ys, xd, yd, turn));	//we try to perform the move
 
 			system("CLS");
 
-			if (needinput) {
+			if (needinput) {	//if the move is correct, the loop will let the other player play, if not, we display that it didn't work and reloop
 				cout << "Illegal command or move" << endl;
 			}
 		}
@@ -63,7 +66,7 @@ void GameManagement::gameloop()
 
 	b->display();
 
-	if (b->inCheck(turn)) {
+	if (b->inCheck(turn)) {		//if the player cannot play and is in check, it's checkmate
 	//if (&b+turn) {
 		if (turn == 0) {
 			cout << "White win by checkmate" << endl << endl;
@@ -73,11 +76,11 @@ void GameManagement::gameloop()
 		}
 	}
 	else {
-		cout << "Draw by stalemate" << endl << endl;
+		cout << "Draw by stalemate" << endl << endl;		//else it's stalemate
 	}
 }
 
 bool GameManagement::isgamefinish()
 {
-	return (b->canplay(turn) == false);
+	return (b->canplay(turn) == false); //the game is finish if one of the player cannot play anymore
 }

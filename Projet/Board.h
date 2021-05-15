@@ -13,8 +13,6 @@ class Board
 		void updatescore();
 		bool operator+(int color);
 		bool inCheck(int color);
-		std::vector<int> whiteKingCoord();
-		std::vector<int> blackKingCoord();
 		bool canplay(int color);
 
 		bool move(int xs, int ys, int xd, int yd, int color);

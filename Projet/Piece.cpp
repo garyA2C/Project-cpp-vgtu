@@ -21,17 +21,17 @@ bool Piece::isKilled() const
     return killed;
 }
 
-bool Piece::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
+bool Piece::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8]) //for polimorphism checking
 {
     cout << "Error";
-    return false;
+    return false;   
 }
 
-bool Piece::legalmove(int xs, int ys, int xd, int yd, int color, Piece* b[8][8])
+bool Piece::legalmove(int xs, int ys, int xd, int yd, int color, Piece* b[8][8]) //check if a piece can move here
 {
-    if (b[xs][ys]) {
+    if (b[xs][ys]) { //if there is a piece on the square
         if (b[xs][ys]->getColor()==color) {
-            if ((xs != xd) || (ys != yd)) {
+            if ((xs != xd) || (ys != yd)) { //if the source and the destination are different
                 return b[xs][ys]->canmove(xs, ys, xd, yd, b);
             }
         }        
@@ -44,17 +44,17 @@ string Piece::getpiece()
     return "  ";
 }
 
-int Piece::operator+(int nb)
+int Piece::operator+(int nb) //overload of + use for adding the score
 {
     return getValue()+nb;
 }
 
-int Piece::operator-(int nb)
+int Piece::operator-(int nb) //overload of - used for substracting the score
 {
     return nb-getValue();
 }
 
-Pawn::Pawn(int newcolor)
+Pawn::Pawn(int newcolor)    //pawn derivate from piece
 {
     value = 1;
     color = newcolor;
@@ -66,6 +66,7 @@ Pawn::~Pawn()
 
 bool Pawn::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
+    //if the destination is an opponent piece, we can eat in diagonal
     if (b[xd][yd]) {
         if (b[xd][yd]->getColor() != getColor()){
             if ((ys == yd + 1) || (ys == yd - 1)) {
@@ -79,6 +80,7 @@ bool Pawn::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
         }
     }
 
+    //if not, we have to go 1 forward or 2 if we are in starting position
     else {
         if (ys == yd) {
             if (getColor() == 0) {
@@ -86,7 +88,7 @@ bool Pawn::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
                     return true;
                 }
                 else {
-                    if ((xs == 6) && (b[5][yd] == nullptr)) {
+                    if ((xs == 6) && (b[5][yd] == nullptr)) { //we check if there is no piece on the column 5 for going two step forward
                         return true;
                     }
                 }
@@ -96,7 +98,7 @@ bool Pawn::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
                     return true;
                 }
                 else {
-                    if ((xs == 1) && (b[2][yd] == nullptr)) {
+                    if ((xs == 1) && (b[2][yd] == nullptr)) { //we check if there is no piece on the column 2 for going two step forward
                         return true;
                     }
                 }
@@ -117,6 +119,7 @@ string Pawn::getpiece()
     }
 }
 
+//knight derive from piece
 Knight::Knight(int newcolor)
 {
     value = 3;
@@ -129,6 +132,7 @@ Knight::~Knight()
 
 bool Knight::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
+    //a knight can move in a L shape
 
     if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) {
 
@@ -153,6 +157,7 @@ string Knight::getpiece()
     }
 }
 
+//rook derive from a piece
 Rook::Rook(int newcolor)
 {
     value = 5;
@@ -165,9 +170,12 @@ Rook::~Rook()
 
 bool Rook::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
-    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) {
+    //a rook can only move on one line
+    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) { //we check if the destination is empty or a piece of opposit color
+        //if horizontal line
         if (xs == xd) {
             if (ys > yd) {
+                //we check if all the square are empty between the two position
                 for (int i = yd + 1; i < ys; i++) {
                     if (b[xs][i]) {
                         return false;
@@ -176,7 +184,7 @@ bool Rook::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
             }
             else {
                 for (int i = ys + 1; i < yd; i++) {
-                    if (b[xs][i]) {
+                    if (b[xs][i]) {                         //we check if all the square are empty between the two position
                         return false;
                     }
                 }
@@ -184,6 +192,7 @@ bool Rook::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
             return true;
 
         }
+        //if vertical line
         else if (ys == yd) {
             if (xs > xd) {
                 for (int i = xd + 1; i < xs; i++) {
@@ -215,6 +224,7 @@ string Rook::getpiece()
     }
 }
 
+//queen derive from Piece
 Queen::Queen(int newcolor)
 {
     value = 9;
@@ -227,7 +237,9 @@ Queen::~Queen()
 
 bool Queen::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
-    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) {
+    //a queen have the power of the rook and the bishop combined, we just copy the code of the two 
+
+    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) { //we check if the destination is empty or a piece of opposit color
         if (abs(xs - xd) == abs(ys - yd)) {
             if (xs > xd) {
                 if (ys > yd) {
@@ -318,6 +330,7 @@ string Queen::getpiece()
     }
 }
 
+//King derive from Piece
 King::King(int newcolor)
 {
     value = INT_MAX;
@@ -330,7 +343,8 @@ King::~King()
 
 bool King::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
-    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) {
+    //a king can move in all direction but only one step
+    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) { //we check if the destination is empty or a piece of opposit color
         if ((abs(xs - xd) <= 1) && (abs(ys - xd) <= 1)) {
             return true;
         }
@@ -348,6 +362,7 @@ string King::getpiece()
     }
 }
 
+//Bishop derive from Piece
 Bishop::Bishop(int newcolor)
 {
     value = 3;
@@ -360,12 +375,14 @@ Bishop::~Bishop()
 
 bool Bishop::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
 {
-    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) {
-        if (abs(xs - xd) == abs(ys - yd)) {
+    //a bishop move in diagonal 
+
+    if (((b[xd][yd]) && (b[xd][yd]->getColor() != getColor())) || (b[xd][yd] == nullptr)) { //we check if the destination is empty or a piece of opposit color
+        if (abs(xs - xd) == abs(ys - yd)) {             //if it make a diagonal
             if (xs > xd) {
                 if (ys > yd) {
-                    for (int i = 1; i < abs(xs - xd); i++) {
-                        if (b[xs - i][ys - i]) {
+                    for (int i = 1; i < abs(xs - xd); i++) {        
+                        if (b[xs - i][ys - i]) {                //we check if there is piece on the way 
                             return false;
                         }
                     }
@@ -373,7 +390,7 @@ bool Bishop::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
                 }
                 else {
                     for (int i = 1; i < abs(xs - xd); i++) {
-                        if (b[xs - i][ys + i]) {
+                        if (b[xs - i][ys + i]) {        //we check if there is piece on the way
                             return false;
                         }
                     }
@@ -383,7 +400,7 @@ bool Bishop::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
             else {
                 if (ys > yd) {
                     for (int i = 1; i < abs(xs - xd); i++) {
-                        if (b[xs + i][ys - i]) {
+                        if (b[xs + i][ys - i]) {        //we check if there is piece on the way
                             return false;
                         }
                     }
@@ -391,8 +408,8 @@ bool Bishop::canmove(int xs, int ys, int xd, int yd, Piece* b[8][8])
                 }
                 else {
                     for (int i = 1; i < abs(xs - xd); i++) {
-                        if (b[xs - i][ys - i]) {
-                            return false;
+                        if (b[xs - i][ys - i]) {        //we check if there is piece on the way
+                            return false;   
                         }
                     }
                     return true;
